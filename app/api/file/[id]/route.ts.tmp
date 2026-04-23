@@ -1,0 +1,47 @@
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+import { getAnnouncements } from "@/data/mockData";
+
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const cookieStore = cookies();
+    const verified = cookieStore.get("verified_email");
+    if (!verified) {
+      return new NextResponse("Unauthorized. Access denied.", { status: 401 });
+    }
+
+    const { id } = params;
+    
+    const announcements = await getAnnouncements();
+    const announcement = announcements.find(a => a.id === id);
+
+    if (!announcement || !announcement.link) {
+      return new NextResponse("File not found.", { status: 404 });
+    }
+
+    // Securely fetch the actual file from the secret URL (e.g. Synology)
+    // We forward the request and return the body
+    const secretUrl = process.env[`MEMO_URL_${announcement.link}`];
+    
+    if (!secretUrl) {
+      return new NextResponse("Link mapping error.", { status: 500 });
+    }
+
+    const response = await fetch(secretUrl);
+
+    if (!response.ok) {
+      return new NextResponse("Failed to retrieve file from storage server.", { status: 502 });
+    }
+
+    const contentType = response.headers.get("content-type") || "application/pdf";
+
+    const fileRes = new NextResponse(response.body);
+    fileRes.headers.set("Content-Type", contentType);
+    fileRes.headers.set("Content-Disposition", `inline; filename="memorandum-${id}.pdf"`);
+
+    return fileRes;
+  } catch (error) {
+    console.error("Secure file serve error:", error);
+    return new NextResponse("Internal server error.", { status: 500 });
+  }
+}
