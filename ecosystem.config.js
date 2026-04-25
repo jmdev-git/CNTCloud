@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'CNTCloud',
-    script: './node_modules/next/dist/bin/next',
+    script: 'npm',
     args: 'start',
     cwd: './',
     instances: 1,
@@ -9,9 +9,7 @@ module.exports = {
     watch: false,
     max_memory_restart: '1G',
     env: {
-      NODE_ENV: 'production',
-      PORT: 1101,
-      HOSTNAME: '0.0.0.0'
+      NODE_ENV: 'production'
     }
   }]
 }

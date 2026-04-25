@@ -5,6 +5,9 @@ import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 import { recordLog } from '@/utils/logger';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 const ALL_CATEGORIES = ['events', 'company-news', 'urgent-notices', 'policy', 'birthday-celebrants', 'food-menu'];
 
 type RouteContext = {
