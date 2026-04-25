@@ -40,7 +40,11 @@ export default function VerifyClient() {
       if (data.ok) {
         // Store email in localStorage for acknowledgment tracking
         setEmployeeEmail(email.toLowerCase().trim());
-        window.location.href = next;
+        
+        // Force a hard redirect to ensure cookies are properly set
+        setTimeout(() => {
+          window.location.href = next;
+        }, 100);
       } else {
         setStatus("error");
         setErrorMessage(data.error || "Failed to verify email");

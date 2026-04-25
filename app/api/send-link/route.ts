@@ -26,13 +26,17 @@ export async function POST(req: Request) {
 
     // Immediate verification: set cookie and return ok
     const res = NextResponse.json({ ok: true, next: next || "/" });
+    
+    // Set cookie with proper settings for production
     res.cookies.set("verified_email", emailLower, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Set to false for HTTP (change to true if using HTTPS)
       sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
+      domain: undefined // Let the browser determine the domain
     });
+    
     return res;
   } catch (error) {
     console.error("Verification error:", error);
