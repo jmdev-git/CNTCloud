@@ -8,6 +8,9 @@ import { recordLog } from '@/utils/logger';
 import { CATEGORIES } from '@/types';
 import https from 'https';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     await dbConnect();
