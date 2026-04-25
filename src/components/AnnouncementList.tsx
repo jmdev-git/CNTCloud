@@ -155,8 +155,8 @@ export default function AnnouncementList({ selectedCategory, selectedBU = 'all',
       {/* Featured Food Menu - Show prominently if selected category is food-menu */}
       {selectedCategory === 'food-menu' && paginatedAnnouncements.length > 0 && (
         <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
-          <div className="bg-[#000] rounded-xl shadow-2xl overflow-hidden border border-white/10 flex flex-col md:flex-row min-h-[400px] md:h-[320px]">
-            <div className="p-6 sm:p-8 md:w-[30%] bg-[#000] text-white flex flex-col justify-center shrink-0 border-b md:border-b-0 md:border-r border-white/5">
+          <div className="bg-zinc-950 rounded-xl shadow-2xl overflow-hidden border border-white/10 flex flex-col md:flex-row min-h-[400px] md:h-[320px]">
+            <div className="p-6 sm:p-8 md:w-[30%] bg-zinc-950 text-white flex flex-col justify-center shrink-0 border-b md:border-b-0 md:border-r border-white/5">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-[#ed1c24] border border-white/10 flex items-center justify-center shadow-lg shadow-[#ed1c24]/20">
                   <LucideIcon name="utensils" className="w-4 h-4 text-white" />
@@ -170,7 +170,7 @@ export default function AnnouncementList({ selectedCategory, selectedBU = 'all',
                 Refreshed for 2026
               </div>
             </div>
-            <div className="md:w-[70%] relative bg-black/20 group min-h-[250px] md:min-h-0">
+            <div className="md:w-[70%] relative bg-zinc-900/20 group min-h-[250px] md:min-h-0">
               {paginatedAnnouncements[0].imageUrl && (
                 <div 
                   className="relative w-full h-full cursor-pointer overflow-hidden"
@@ -190,7 +190,7 @@ export default function AnnouncementList({ selectedCategory, selectedBU = 'all',
                   />
                   {/* Overlay to ensure readability and indicate clickability */}
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                    <div className="bg-[#000] px-6 py-3 rounded-xl border border-white/10 shadow-2xl text-white font-black uppercase tracking-tighter text-[10px] flex items-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 scale-100 sm:scale-95 group-hover:scale-100">
+                    <div className="bg-zinc-950 px-6 py-3 rounded-xl border border-white/10 shadow-2xl text-white font-black uppercase tracking-tighter text-[10px] flex items-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-300 scale-100 sm:scale-95 group-hover:scale-100">
                       <LucideIcon name="maximize-2" className="w-4 h-4" />
                       View Full Menu
                     </div>

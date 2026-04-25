@@ -334,11 +334,11 @@ export default function AnnouncementCard({
       "urgent-notices": "bg-rose-950/40 border-rose-500/30",
       policy: "bg-violet-950/40 border-violet-500/30",
       "birthday-celebrants": "bg-amber-950/40 border-amber-500/30",
-      "food-menu": "bg-[#000] border-[#000]/30",
+      "food-menu": "bg-zinc-950 border-zinc-900/30",
     };
     
     // If it's a dynamic category, use a neutral theme or derive from color
-    return map[announcement.category] || "bg-slate-900/40 border-slate-500/30";
+    return map[announcement.category] || "bg-zinc-900/40 border-zinc-500/30";
   };
 
   const getCategoryGlowClasses = () => {
@@ -348,7 +348,7 @@ export default function AnnouncementCard({
       "urgent-notices": "from-rose-500/20 via-rose-500/10 to-transparent",
       policy: "from-violet-500/20 via-violet-500/10 to-transparent",
       "birthday-celebrants": "from-amber-500/20 via-amber-500/10 to-transparent",
-      "food-menu": "from-slate-500/20 via-slate-500/10 to-transparent",
+      "food-menu": "from-zinc-500/20 via-zinc-500/10 to-transparent",
     };
     return map[announcement.category] || "from-blue-500/20 via-blue-500/10 to-transparent";
   };
@@ -360,9 +360,9 @@ export default function AnnouncementCard({
       "urgent-notices": "from-rose-950/28 via-rose-950/10 to-transparent",
       policy: "from-violet-950/28 via-violet-950/10 to-transparent",
       "birthday-celebrants": "from-amber-950/25 via-amber-950/10 to-transparent",
-      "food-menu": "from-slate-950/25 via-slate-950/10 to-transparent",
+      "food-menu": "from-zinc-950/25 via-zinc-950/10 to-transparent",
     };
-    return map[announcement.category] || "from-slate-950/25 via-slate-950/10 to-transparent";
+    return map[announcement.category] || "from-zinc-950/25 via-zinc-950/10 to-transparent";
   };
 
   const getModalHeaderGradient = () => {
@@ -372,7 +372,7 @@ export default function AnnouncementCard({
       "urgent-notices": "bg-gradient-to-r from-rose-600/20 to-transparent",
       policy: "bg-gradient-to-r from-violet-600/20 to-transparent",
       "birthday-celebrants": "bg-gradient-to-r from-amber-600/20 to-transparent",
-      "food-menu": "bg-gradient-to-r from-slate-600/20 to-transparent",
+      "food-menu": "bg-gradient-to-r from-zinc-600/20 to-transparent",
     };
     return map[announcement.category] || "bg-gradient-to-r from-white/10 to-transparent";
   };
@@ -384,7 +384,7 @@ export default function AnnouncementCard({
       "urgent-notices": "border-rose-500/30 shadow-[0_0_40px_-10px_rgba(244,63,94,0.2)]",
       policy: "border-violet-500/30 shadow-[0_0_40px_-10px_rgba(139,92,246,0.2)]",
       "birthday-celebrants": "border-amber-500/30 shadow-[0_0_40px_-10px_rgba(245,158,11,0.2)]",
-      "food-menu": "border-slate-500/30 shadow-[0_0_40px_-10px_rgba(100,116,139,0.2)]",
+      "food-menu": "border-zinc-500/30 shadow-[0_0_40px_-10px_rgba(113,113,122,0.2)]",
     };
     return map[announcement.category] || "border-white/10 shadow-2xl";
   };

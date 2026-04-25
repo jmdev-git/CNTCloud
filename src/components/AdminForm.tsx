@@ -699,7 +699,7 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
           {category === 'birthday-celebrants' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {formData.imageUrls.map((url, index) => (
-                <div key={index} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10 shadow-xl bg-black/20">
+                <div key={index} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10 shadow-xl bg-zinc-900/20">
                   <Image 
                     src={url} 
                     alt={`Preview ${index}`} 
@@ -896,7 +896,7 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {[
                 { id: 'GENERAL', label: 'Public Access', desc: 'Open to all employees', icon: 'globe' },
-                { id: 'BU_ONLY', label: 'Department Restricted', desc: 'Specific business units', icon: 'building-2' },
+                { id: 'BU_ONLY', label: 'Business Unit Restricted', desc: 'Specific business units', icon: 'building-2' },
                 { id: 'INVITE_ONLY', label: 'Exclusive Invite', desc: 'Designated guests only', icon: 'ticket' },
                 { id: 'RULE_BASED', label: 'Attribute-Based', desc: 'Filtered by profile data', icon: 'filter' },
               ].map((type) => (
