@@ -90,7 +90,7 @@ export default function LatestNews() {
     }).sort((a, b) => {
       const aDate = new Date(a.createdAt);
       const bDate = new Date(b.createdAt);
-      return aDate.getTime() - bDate.getTime();
+      return bDate.getTime() - aDate.getTime(); // Newest first (descending order)
     });
   })();
 

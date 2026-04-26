@@ -151,7 +151,7 @@ export default function Home() {
   const features = [
     {
       title: "CloudSpace Storage",
-      description: "Sign in to access your cloud workspace and tools safely and securely anytime, anywhere.",
+      description: "Sign in to access your cloud workspace, securely anytime, anywhere.",
       icon: "/nas.gif",
       link: "https://cntcloudspace.quickconnect.to/https_first"
     },
