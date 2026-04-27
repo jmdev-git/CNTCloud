@@ -124,17 +124,17 @@ export default function EventsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#ed1c24] to-[#b71c1c] py-12 px-4">
+      <div className="bg-linear-to-r from-[#ed1c24] to-[#b71c1c] py-10 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-4">Event Registration</h1>
-          <p className="text-white/80 text-lg">
+          <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Event Registration</h1>
+          <p className="text-white/80 text-sm sm:text-lg">
             Register for upcoming events and get your QR code for attendance
           </p>
         </div>
       </div>
 
       {/* Events List */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
         {events.length === 0 ? (
           <div className="text-center py-12">
             <LucideIcon name="calendar" className="w-16 h-16 text-slate-600 mx-auto mb-4" />

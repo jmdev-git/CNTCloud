@@ -179,18 +179,18 @@ export default function HelpdeskPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-[#000] text-white border-b border-white/5">
+      <section className="py-12 sm:py-16 bg-[#000] text-white border-b border-white/5">
         <div className="container px-6 mx-auto">
-          <div className="max-w-6xl mx-auto space-y-12">
+          <div className="max-w-6xl mx-auto space-y-8 sm:space-y-12">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 uppercase">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-4 uppercase">
                 How to access the IT Helpdesk System?
               </h2>
               <div className="w-20 h-2 bg-[#ed1c24] rounded-full" />
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-10 items-stretch">
-              <div className="relative lg:col-span-2 h-full min-h-[260px] rounded-3xl overflow-hidden shadow-2xl border-8 border-white/5 group">
+            <div className="grid lg:grid-cols-3 gap-6 sm:gap-10 items-stretch">
+              <div className="relative lg:col-span-2 h-full min-h-[200px] sm:min-h-[260px] rounded-3xl overflow-hidden shadow-2xl border-8 border-white/5 group">
                 <video
                   className="w-full h-full object-cover"
                   controls
@@ -208,28 +208,28 @@ export default function HelpdeskPage() {
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                <div className="p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10">
-                  <span className="text-4xl font-bold text-[#ed1c24]/20 mb-2 block">
+                <div className="p-5 sm:p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10">
+                  <span className="text-3xl sm:text-4xl font-bold text-[#ed1c24]/20 mb-2 block">
                     01
                   </span>
-                  <h4 className="font-bold text-lg mb-2 text-white uppercase">
+                  <h4 className="font-bold text-base sm:text-lg mb-2 text-white uppercase">
                     PORTAL LINK
                   </h4>
                   <a
                     href="https://itcntpromoads.on.spiceworks.com/portal"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#ed1c24] font-bold hover:underline inline-flex items-center gap-2"
+                    className="text-[#ed1c24] font-bold hover:underline inline-flex items-center gap-2 text-sm sm:text-base"
                   >
                     Access Portal <ExternalLink className="w-4 h-4" />
                   </a>
                 </div>
 
-                <div className="p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10">
-                  <span className="text-4xl font-bold text-[#ed1c24]/20 mb-2 block">
+                <div className="p-5 sm:p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10">
+                  <span className="text-3xl sm:text-4xl font-bold text-[#ed1c24]/20 mb-2 block">
                     02
                   </span>
-                  <h4 className="font-bold text-lg mb-2 text-white uppercase">
+                  <h4 className="font-bold text-base sm:text-lg mb-2 text-white uppercase">
                     Login Details
                   </h4>
                   <p className="text-gray-400 text-sm leading-relaxed">
@@ -237,11 +237,11 @@ export default function HelpdeskPage() {
                   </p>
                 </div>
 
-                <div className="p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10">
-                  <span className="text-4xl font-bold text-[#ed1c24]/20 mb-2 block">
+                <div className="p-5 sm:p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10">
+                  <span className="text-3xl sm:text-4xl font-bold text-[#ed1c24]/20 mb-2 block">
                     03
                   </span>
-                  <h4 className="font-bold text-lg mb-2 text-white uppercase">
+                  <h4 className="font-bold text-base sm:text-lg mb-2 text-white uppercase">
                     Step-by-Step Walkthrough
                   </h4>
                   <p className="text-gray-400 text-sm leading-relaxed">

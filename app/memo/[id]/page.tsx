@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -96,10 +96,11 @@ export default function MemoAcknowledgePage() {
     const memoBU = normalizeBU(memo.businessUnit || "");
     const employeeBU = normalizeBU(employee.businessUnit || "");
 
-    // CNT GROUP can access all memorandums
+    // Allow if: employee is CNT GROUP, memo is CNT GROUP (applies to all), or BUs match
     if (
       employeeBU !== "CNT GROUP" &&
       memoBU &&
+      memoBU !== "CNT GROUP" &&
       employeeBU &&
       memoBU !== employeeBU
     ) {

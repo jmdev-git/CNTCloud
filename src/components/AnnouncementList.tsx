@@ -113,6 +113,7 @@ export default function AnnouncementList({ selectedCategory, selectedBU = 'all',
       });
 
       setAnnouncements(sorted);
+      setCurrentPage(1);
     };
 
     loadAnnouncements();

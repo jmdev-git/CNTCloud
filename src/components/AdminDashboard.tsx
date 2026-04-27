@@ -608,22 +608,18 @@ export default function AdminDashboard({
 
     // 3. Special visibility for Super Admins and CNT GROUP members
     if (canSeeAllMemos) {
-      // Rule: Always see Policies from ANY business unit
+      // itadmin (root) sees everything
+      if (isItAdmin) return true;
+
+      // CNT GROUP admins see ALL announcements across all business units
+      const userBUs = (currentUserBusinessUnits || []).map((u) => normalizeBU(u));
+      if (userBUs.some((bu) => bu === "CNT GROUP")) return true;
+
+      // Other elevated admins: see policies from any BU + their own BU's content
       if (ann.category === "policy") return true;
 
-      // Rule: See everything else from their OWN assigned business units
       const memoBU = normalizeBU(ann.businessUnit || "");
-      const userBUs = (currentUserBusinessUnits || []).map((u) =>
-        normalizeBU(u),
-      );
-
-      // itadmin (root) with no assigned BUs sees everything by default
-      if (isItAdmin && userBUs.length === 0) return true;
-
-      // Check if it belongs to their assigned BUs
       if (userBUs.includes(memoBU)) return true;
-
-      // Rule: If it's for "ALL" business units, they should see it
       if (memoBU === "ALL") return true;
     }
 
@@ -645,6 +641,30 @@ export default function AdminDashboard({
       return isMemoVisible(ann);
     });
   }, [localAnnouncements, isMemoVisible, isItAdmin, isCNTGroupAdmin, session?.user?.isScannerOnly, session?.user?.email, session?.user?.name]);
+
+  // Combined list of all people (company emails + admin users) for acknowledgment tracking
+  const allPeople = useMemo(() => {
+    // Admin users: username is their email, businessUnits is an array
+    const admins = adminUsers
+      .filter((u) => u.type === 'admin' && u.username && u.username.includes('@'))
+      .map((u) => ({
+        email: u.username.toLowerCase(),
+        name: u.name || u.username,
+        businessUnit: (u.businessUnits || [])[0] || '',
+      }));
+
+    // Company emails
+    const employees = companyEmails.map((e) => ({
+      email: e.email.toLowerCase(),
+      name: e.name,
+      businessUnit: e.businessUnit || '',
+    }));
+
+    // Merge, deduplicate by email (company email record takes priority)
+    const emailSet = new Set(employees.map((e) => e.email));
+    const uniqueAdmins = admins.filter((a) => !emailSet.has(a.email));
+    return [...employees, ...uniqueAdmins];
+  }, [companyEmails, adminUsers]);
 
   useEffect(() => {
     if (
@@ -1199,7 +1219,7 @@ export default function AdminDashboard({
 
     // Use the same filtering logic as the dashboard
     const mbu = normalizeBU(memo.businessUnit || "");
-    const employees = companyEmails.filter((e) => {
+    const employees = allPeople.filter((e) => {
       const ebu = normalizeBU(e.businessUnit || "");
 
       // Rule 1: Filter by viewer's allowed BUs if restricted
@@ -1217,8 +1237,8 @@ export default function AdminDashboard({
         if (ebu !== normalizeBU(trackingFilterBU)) return false;
       }
 
-      // Rule 3: Filter by memo's assigned BU
-      if (mbu && mbu !== "ALL") {
+      // Rule 3: CNT GROUP and ALL mean the memo applies to every employee
+      if (mbu && mbu !== "ALL" && mbu !== "CNT GROUP") {
         return ebu === mbu;
       }
 
@@ -1834,31 +1854,29 @@ export default function AdminDashboard({
             {/* Active Tab Content Rendering */}
             {activeTab === "dashboard" && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
-                <div className="flex items-center justify-between gap-4">
-                  <h1 className="text-2xl font-black text-white uppercase tracking-tight">Dashboard Overview</h1>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1 p-1 bg-zinc-900/40 rounded-xl border border-white/10">
-                      <button
-                        onClick={() => setFilterMode('current')}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
-                          filterMode === 'current'
-                            ? 'bg-[#ed1c24] text-white shadow-lg'
-                            : 'text-zinc-500 hover:text-white hover:bg-zinc-900/40'
-                        }`}
-                      >
-                        Current Month
-                      </button>
-                      <button
-                        onClick={() => setFilterMode('last2')}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${
-                          filterMode === 'last2'
-                            ? 'bg-[#ed1c24] text-white shadow-lg'
-                            : 'text-zinc-500 hover:text-white hover:bg-zinc-900/40'
-                        }`}
-                      >
-                        Last 2 Months
-                      </button>
-                    </div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <h1 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">Dashboard Overview</h1>
+                  <div className="flex items-center gap-1 p-1 bg-zinc-900/40 rounded-xl border border-white/10 w-full sm:w-auto">
+                    <button
+                      onClick={() => setFilterMode('current')}
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all ${
+                        filterMode === 'current'
+                          ? 'bg-[#ed1c24] text-white shadow-lg'
+                          : 'text-zinc-500 hover:text-white hover:bg-zinc-900/40'
+                      }`}
+                    >
+                      Current Month
+                    </button>
+                    <button
+                      onClick={() => setFilterMode('last2')}
+                      className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all ${
+                        filterMode === 'last2'
+                          ? 'bg-[#ed1c24] text-white shadow-lg'
+                          : 'text-zinc-500 hover:text-white hover:bg-zinc-900/40'
+                      }`}
+                    >
+                      Last 2 Months
+                    </button>
                   </div>
                 </div>
 
@@ -1912,18 +1930,18 @@ export default function AdminDashboard({
                                 "absolute inset-x-0 top-0 h-24 bg-gradient-to-b pointer-events-none",
                                 getStatTopGradient(cat)
                               )} />
-                              <div className="relative flex items-center gap-3 mb-8">
+                              <div className="relative flex items-center gap-3 mb-6 sm:mb-8">
                                 <span className={cn(
-                                  "inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white/5 border border-white/10 shadow-inner transition-transform group-hover:scale-110",
+                                  "inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 shadow-inner transition-transform group-hover:scale-110",
                                   getStatIconColor(cat)
                                 )}>
-                                  <LucideIcon name={getIconNameForCategory(cat)} className="w-5 h-5" />
+                                  <LucideIcon name={getIconNameForCategory(cat)} className="w-4 h-4 sm:w-5 sm:h-5" />
                                 </span>
                                 <div className="min-w-0">
-                                  <div className="text-base font-black tracking-wide leading-tight uppercase text-white truncate">
+                                  <div className="text-sm sm:text-base font-black tracking-wide leading-tight uppercase text-white truncate">
                                     {category.displayName}
                                   </div>
-                                  <div className="text-[11px] font-bold uppercase tracking-widest text-white/30 mt-1">
+                                  <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-widest text-white/30 mt-1">
                                     {filterMode === 'current' 
                                       ? `${months[new Date().getMonth()]} ${new Date().getFullYear()}`
                                       : `${months[(new Date().getMonth() - 2 + 12) % 12]} - ${months[(new Date().getMonth() - 1 + 12) % 12]} ${new Date().getFullYear()}`
@@ -1988,9 +2006,9 @@ export default function AdminDashboard({
                           return <div className="flex justify-center py-2">{chartCircle}</div>;
                         }
                         return (
-                          <div className="flex flex-row items-center gap-8">
+                          <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
                             {chartCircle}
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-10 gap-y-3 flex-1">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 sm:gap-x-10 gap-y-3 flex-1 w-full">
                               {pieSlices?.filter(s => s.value > 0).map((slice, i) => (
                                 <div key={i} className="flex items-center gap-2">
                                   <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: slice.color }} />
@@ -2242,11 +2260,11 @@ export default function AdminDashboard({
             {canAccessCategory("policy") && activeTab === "tracking" && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
                 {/* Tracking Control Card - Matches Content Management Header */}
-                <div className="bg-zinc-950 rounded-2xl border border-white/10 shadow-2xl p-8">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <div className="bg-zinc-950 rounded-2xl border border-white/10 shadow-2xl p-5 sm:p-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
                     <div className="flex items-center gap-5">
-                                            <div>
-                        <h3 className="text-xl font-bold text-white tracking-tight uppercase">Memorandum Tracking</h3>
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight uppercase">Memorandum Tracking</h3>
                         <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest mt-0.5">Monitor policy compliance and acknowledgment status</p>
                       </div>
                     </div>
@@ -2302,13 +2320,13 @@ export default function AdminDashboard({
 
                 {/* Unified List View - Matches Active Feed Structure */}
                 <div className="space-y-6">
-                  <div className="flex items-center justify-between px-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-zinc-900/40 rounded-xl flex items-center justify-center border border-white/10">
+                      <div className="w-10 h-10 bg-zinc-900/40 rounded-xl flex items-center justify-center border border-white/10 shrink-0">
                         <LucideIcon name="bar-chart-3" className="w-5 h-5 text-[#ed1c24]" />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold text-white tracking-tight uppercase">Active Tracking</h3>
+                        <h3 className="text-base sm:text-lg font-bold text-white tracking-tight uppercase">Active Tracking</h3>
                         <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">
                           Monitoring {
                             visibleAnnouncements
@@ -2342,13 +2360,13 @@ export default function AdminDashboard({
                       const emailsByMemo: Record<string, Set<string>> = {};
                       trackedMemos.forEach((m) => {
                         const mbu = normalizeBU(m.businessUnit || "");
-                        const allowed = companyEmails.filter((e) => {
+                        const allowed = allPeople.filter((e) => {
                           const ebu = normalizeBU(e.businessUnit || "");
                           if (!canSeeAllMemos && currentUserBusinessUnits?.length) {
                             if (!currentUserBusinessUnits.map(u => normalizeBU(u)).includes(ebu)) return false;
                           }
                           if (trackingFilterBU !== "all" && ebu !== normalizeBU(trackingFilterBU)) return false;
-                          if (mbu && mbu !== "ALL") return ebu === mbu;
+                          if (mbu && mbu !== "ALL" && mbu !== "CNT GROUP") return ebu === mbu;
                           return true;
                         }).map((e) => e.email.toLowerCase());
                         emailsByMemo[m.id] = new Set(allowed);
@@ -2396,13 +2414,13 @@ export default function AdminDashboard({
 
                       return filteredMemos.map((a) => {
                         const mbu = normalizeBU(a.businessUnit || "");
-                        const employees = companyEmails.filter((e) => {
+                        const employees = allPeople.filter((e) => {
                           const ebu = normalizeBU(e.businessUnit || "");
                           if (!canSeeAllMemos && currentUserBusinessUnits?.length) {
                             if (!currentUserBusinessUnits.map(u => normalizeBU(u)).includes(ebu)) return false;
                           }
                           if (trackingFilterBU !== "all" && ebu !== normalizeBU(trackingFilterBU)) return false;
-                          if (mbu && mbu !== "ALL") return ebu === mbu;
+                          if (mbu && mbu !== "ALL" && mbu !== "CNT GROUP") return ebu === mbu;
                           return true;
                         });
                         
@@ -2461,7 +2479,7 @@ export default function AdminDashboard({
                                       <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl transition-all duration-500 group-hover:scale-105">
                                         <LucideIcon name="file-text" className="w-8 h-8 text-white" />
                                       </div>
-                                      <h4 className="flex-1 font-black text-white text-3xl leading-tight line-clamp-2 transition-colors group-hover:text-white/90">
+                                      <h4 className="flex-1 font-black text-white text-xl leading-tight line-clamp-2 transition-colors group-hover:text-white/90">
                                         {stripLeadingEmoji(a.title)}
                                       </h4>
                                     </div>
@@ -3872,7 +3890,7 @@ export default function AdminDashboard({
                                           "text-[9px] font-bold uppercase tracking-widest transition-colors",
                                           editingCompanyPromoteToAdmin ? "text-[#ed1c24]" : "text-zinc-500 group-hover:text-zinc-400"
                                         )}>
-                                          Promote to Admin
+                                          Set as Admin
                                         </span>
                                       </button>
                                     </div>
@@ -4466,22 +4484,21 @@ export default function AdminDashboard({
             {canManageUsers && activeTab === "business-units" && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
                 {/* Header Card */}
-                <div className="bg-zinc-950 rounded-xl border border-white/10 shadow-lg p-6 flex items-center justify-between gap-4">
+                <div className="bg-zinc-950 rounded-xl border border-white/10 shadow-lg p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                                        <div>
-                      <h3 className="text-xl font-bold text-white tracking-tight uppercase">
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight uppercase">
                         Business Units
                       </h3>
                       <p className="text-sm text-zinc-400 font-medium mt-1">
-                        Create and manage business units, including branding and
-                        logos.
+                        Create and manage business units, including branding and logos.
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => setIsCreatingBU(true)}
-                      className="px-5 h-10 bg-[#ed1c24] text-white rounded-lg text-[11px] font-bold uppercase tracking-widest hover:bg-red-800 flex items-center gap-2.5 transition-all shadow-md active:scale-[0.98]"
+                      className="w-full sm:w-auto px-5 h-10 bg-[#ed1c24] text-white rounded-lg text-[11px] font-bold uppercase tracking-widest hover:bg-red-800 flex items-center justify-center gap-2.5 transition-all shadow-md active:scale-[0.98]"
                     >
                       <LucideIcon name="plus" className="w-3.5 h-3.5" />
                       Add New

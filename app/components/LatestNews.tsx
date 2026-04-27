@@ -48,7 +48,9 @@ export default function LatestNews() {
         console.error('Failed to fetch attendance events:', error);
       }
       
-      setAllData([...mockAnnouncements, ...sampleAnnouncements, ...attendanceEvents]);
+      const combined = [...mockAnnouncements, ...sampleAnnouncements, ...attendanceEvents];
+      combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setAllData(combined);
     };
     fetchData();
   }, [refreshTrigger]);

@@ -196,16 +196,16 @@ export default function EventRegistrationPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0a]">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#ed1c24] to-[#b71c1c] py-12 px-4">
+      <div className="bg-linear-to-r from-[#ed1c24] to-[#b71c1c] py-10 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold text-white mb-4">EVENT REGISTRATION: {event.title.toUpperCase()}</h1>
-          <p className="text-white/80 text-lg">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-4 leading-tight">EVENT REGISTRATION: {event.title.toUpperCase()}</h1>
+          <p className="text-white/80 text-sm sm:text-lg">
             Register for this event and get your QR code for attendance
           </p>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Event Details */}
           <div className="space-y-6">
@@ -365,11 +365,11 @@ export default function EventRegistrationPage() {
 
                   <div className="text-center">
                     <h3 className="text-white font-semibold text-lg mb-4">Your QR Code</h3>
-                    <div className="bg-white p-6 rounded-xl inline-block">
+                    <div className="bg-white p-4 sm:p-6 rounded-xl inline-block">
                       <img 
                         src={registration.qrCodeData} 
                         alt="Event QR Code" 
-                        className="w-64 h-64"
+                        className="w-48 h-48 sm:w-64 sm:h-64"
                       />
                     </div>
                     <p className="text-slate-400 text-sm mt-4">

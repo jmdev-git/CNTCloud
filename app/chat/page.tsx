@@ -82,9 +82,9 @@ export default function ChatPage() {
       />
 
       {/* 2️⃣ High-Density Interface Zone */}
-      <section className="py-16 bg-[#000] text-white border-y border-white/5">
+      <section className="py-10 sm:py-16 bg-[#000] text-white border-y border-white/5">
         <div className="container px-6 mx-auto">
-          <div className="grid lg:grid-cols-2 gap-20 items-start">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-start">
             {/* Visual: Carousel with Phone Frame */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
@@ -108,7 +108,7 @@ export default function ChatPage() {
                       "a6.png",
                     ].map((img, i) => (
                       <CarouselItem key={i} className="basis-full">
-                        <div className="relative h-[260px] md:h-[500px] rounded-[2.25rem] overflow-hidden bg-white/5">
+                        <div className="relative h-[200px] sm:h-[320px] md:h-[500px] rounded-[2.25rem] overflow-hidden bg-white/5">
                           <Image
                             src={`/${img}`}
                             alt={`Interface ${i + 1}`}
@@ -125,19 +125,19 @@ export default function ChatPage() {
             </motion.div>
 
             {/* Content: Features Grid */}
-            <div className="space-y-10">
+            <div className="space-y-6 sm:space-y-10">
               <div>
-                <h2 className="text-4xl xl:text-5xl font-bold uppercase tracking-tight leading-tight mb-5">
+                <h2 className="text-3xl xl:text-5xl font-bold uppercase tracking-tight leading-tight mb-4 sm:mb-5">
                   Structured{" "}
                   <span className="text-[#ed1c24]">Communication.</span>
                 </h2>
-                <p className="text-lg xl:text-xl text-gray-400 font-medium max-w-md">
+                <p className="text-base sm:text-lg xl:text-xl text-gray-400 font-medium max-w-md">
                   No more messy threads or lost files. Everything where it
                   belongs.
                 </p>
               </div>
 
-              <div className="grid gap-5">
+              <div className="grid gap-4 sm:gap-5">
                 {[
                   {
                     title: "Smart Channels",
@@ -157,13 +157,13 @@ export default function ChatPage() {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="flex gap-6 p-6 bg-white/5 backdrop-blur-md rounded-3xl hover:bg-[#ed1c24]/5 transition-colors border-l-8 border-[#ed1c24] border-y border-r border-white/5"
+                    className="flex gap-4 sm:gap-6 p-5 sm:p-6 bg-white/5 backdrop-blur-md rounded-3xl hover:bg-[#ed1c24]/5 transition-colors border-l-8 border-[#ed1c24] border-y border-r border-white/5"
                   >
-                    <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#ed1c24] border border-white/10 shrink-0">
-                      <item.icon className="w-6 h-6" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#ed1c24] border border-white/10 shrink-0">
+                      <item.icon className="w-5 h-5 sm:w-6 sm:h-6" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-lg mb-1 uppercase tracking-tight text-white">
+                      <h3 className="font-bold text-base sm:text-lg mb-1 uppercase tracking-tight text-white">
                         {item.title}
                       </h3>
                       <p className="text-gray-400 text-sm">{item.desc}</p>
