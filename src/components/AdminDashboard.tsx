@@ -4579,7 +4579,7 @@ export default function AdminDashboard({
                                 try {
                                   const res = await uploadImage(formData);
                                   if (res.success) {
-                                    setNewBUImage(res.url || res.path || "");
+                                    setNewBUImage(res.url || "");
                                     sileo.success({ title: "Logo uploaded" });
                                   } else {
                                     sileo.error({
@@ -4785,7 +4785,7 @@ export default function AdminDashboard({
                                               await uploadImage(formData);
                                             if (res.success) {
                                               setEditingBUImage(
-                                                res.url || res.path || "",
+                                                res.url || "",
                                               );
                                               sileo.success({
                                                 title: "Logo uploaded",

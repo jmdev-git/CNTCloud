@@ -548,12 +548,12 @@ export default function AnnouncementCard({
 
       {bgSrc && !isCompact && (
         <div className="absolute inset-0 z-0">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src={bgSrc}
             alt={announcement.title}
-            fill
             className={cn(
-              "object-cover transition-transform duration-1000 group-hover:scale-110",
+              "absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110",
               !announcement.imageUrl && !announcement.imageUrls && "opacity-80"
             )}
             onError={() => {
@@ -685,11 +685,11 @@ export default function AnnouncementCard({
           {/* Event Image Preview - Hidden in card-bg mode or compact mode */}
           {isEvent && !isCompact && !bgSrc && announcement.imageUrl && (
             <div className="mb-3 relative w-full h-24 rounded-lg overflow-hidden border border-gray-200">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={announcement.imageUrl}
                 alt="Event Image"
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
           )}
@@ -1059,12 +1059,11 @@ export default function AnnouncementCard({
                     <CarouselContent className="h-full">
                       {announcement.imageUrls.map((url, index) => (
                         <CarouselItem key={index} className="relative h-full">
-                          <Image
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
                             src={url}
                             alt={`Birthday ${index + 1}`}
-                            fill
-                            className="object-cover"
-                            priority={index === 0}
+                            className="w-full h-full object-cover"
                           />
                         </CarouselItem>
                       ))}
@@ -1126,12 +1125,11 @@ export default function AnnouncementCard({
 
                 {/* Middle Image Section (Standardized Corporate 1920x760) */}
                 <div className="relative w-full aspect-[1920/760] bg-black/40 overflow-hidden">
-                  <Image
-                    src={announcement.imageUrl}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={announcement.imageUrl!}
                     alt="Food Menu"
-                    fill
-                    className="object-cover"
-                    priority
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
@@ -1307,12 +1305,11 @@ export default function AnnouncementCard({
 
                 {/* Middle Image Section (Corporate 1920x760) */}
                 <div className="relative w-full aspect-[1920/760] bg-black/40 overflow-hidden">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={announcement.imageUrl || "/event.png"}
                     alt="Event Image"
-                    fill
-                    className="object-cover"
-                    priority
+                    className="w-full h-full object-cover"
                   />
                 </div>
 
@@ -1367,12 +1364,11 @@ export default function AnnouncementCard({
                 {/* Hero Image (Corporate 1920x760) */}
                 {announcement.imageUrl && (
                   <div className="relative w-full aspect-[1920/760] bg-black/40 overflow-hidden border-y border-white/5">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={announcement.imageUrl}
                       alt={announcement.title}
-                      fill
-                      className="object-cover"
-                      priority
+                      className="w-full h-full object-cover"
                     />
                   </div>
                 )}

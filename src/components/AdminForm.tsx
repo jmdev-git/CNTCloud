@@ -74,6 +74,7 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
   }, []);
 
   const [isUploading, setIsUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [users, setUsers] = useState<{ _id: string; name: string; email: string; businessUnit?: string }[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const [userSearch, setUserSearch] = useState('');
@@ -557,28 +558,35 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
     setIsUploading(true);
     setErrors(prev => ({ ...prev, [field]: '' }));
 
+    // Show local preview immediately
+    if (field === 'imageUrl') {
+      const localUrl = URL.createObjectURL(file);
+      setPreviewUrl(localUrl);
+    }
+
     const formData = new FormData();
     formData.append("file", file);
 
     try {
       const result = await uploadImage(formData);
       if (result.success) {
-        const url = result.url 
-          ? result.url 
-          : `${process.env.NEXT_PUBLIC_NAS_BASE_URL}${result.path}`;
+        const url = result.url ?? "";
         if (field === 'imageUrl' && category === 'birthday-celebrants') {
           setFormData(prev => ({
             ...prev,
             imageUrls: [...prev.imageUrls, url]
           }));
+          setPreviewUrl(null);
         } else {
           handleInputChange(field, url);
+          setPreviewUrl(null);
         }
       } else {
         throw new Error(result.error || "Upload failed");
       }
     } catch (error) {
       console.error('Upload error:', error);
+      setPreviewUrl(null);
       const message = error instanceof Error ? error.message : 'Upload failed. Please try again.';
       setErrors(prev => ({ 
         ...prev, 
@@ -700,12 +708,8 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {formData.imageUrls.map((url, index) => (
                 <div key={index} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10 shadow-xl bg-zinc-900/20">
-                  <Image 
-                    src={url} 
-                    alt={`Preview ${index}`} 
-                    fill 
-                    className="object-cover"
-                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
@@ -737,19 +741,28 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
                   className="w-full px-3 py-2 border border-white/10 rounded-md bg-white/5 text-white file:bg-[#ed1c24] file:text-white file:border-none file:rounded-md file:px-3 file:py-1 file:mr-3 file:cursor-pointer hover:file:bg-[#c51a15]"
                   accept=".jfif,.jpg,.jpeg,.webp"
                 />
-              {formData.imageUrl && (
+              {(formData.imageUrl || previewUrl) && (
                 <div className="relative w-40 aspect-video rounded-lg overflow-hidden border border-white/10 shadow-xl group">
-                  <Image src={formData.imageUrl} alt="Preview" fill className="object-cover" />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormData(prev => ({ ...prev, imageUrl: '', imageUrls: [] }));
-                    }}
-                    aria-label="Remove image"
-                    className="absolute top-1 right-1 bg-rose-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                  >
-                    <LucideIcon name="trash-2" className="w-3 h-3" />
-                  </button>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={previewUrl || formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                  {isUploading && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <LucideIcon name="loader-2" className="w-5 h-5 text-white animate-spin" />
+                    </div>
+                  )}
+                  {!isUploading && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData(prev => ({ ...prev, imageUrl: '', imageUrls: [] }));
+                        setPreviewUrl(null);
+                      }}
+                      aria-label="Remove image"
+                      className="absolute top-1 right-1 bg-rose-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                    >
+                      <LucideIcon name="trash-2" className="w-3 h-3" />
+                    </button>
+                  )}
                 </div>
               )}
             </div>

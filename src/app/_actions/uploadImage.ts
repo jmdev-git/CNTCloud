@@ -1,8 +1,12 @@
 'use server';
 
-import { getClient } from "@/lib/nas";
+import { writeFile, mkdir } from "fs/promises";
+import { existsSync } from "fs";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
 import { revalidatePath } from "next/cache";
-import { v2 as cloudinary } from "cloudinary";
+
+const UPLOAD_DIR = process.env.UPLOAD_DIR || "C:/uploads";
 
 export async function uploadImage(formData: FormData) {
   const file = formData.get("file") as File | null;
@@ -14,56 +18,26 @@ export async function uploadImage(formData: FormData) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const isImage = (file.type && file.type.startsWith("image/")) || 
-                   /\.(jpg|jpeg|jfif|webp|png|gif)$/i.test(file.name);
-
-    if (isImage) {
-      if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-        console.error("Cloudinary credentials missing");
-        return { success: false, error: "Cloudinary configuration missing on server" };
-      }
-
-      cloudinary.config({
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
-        secure: true,
-      });
-
-      const folder = process.env.CLOUDINARY_FOLDER || "digital_bulletin";
-      const base64 = buffer.toString("base64");
-      const dataUri = `data:${file.type || 'image/jpeg'};base64,${base64}`;
-      const result = await cloudinary.uploader.upload(dataUri, {
-        folder,
-        resource_type: "image",
-        use_filename: true,
-        unique_filename: true,
-        overwrite: false,
-      });
-
-      revalidatePath("/");
-      return { success: true, url: result.secure_url, publicId: result.public_id };
-    }
-
-    if (!process.env.NAS_URL || !process.env.NAS_USER || !process.env.NAS_PASS) {
-      console.error("NAS credentials missing");
-      return { success: false, error: "NAS configuration missing on server" };
-    }
-
-    const client = getClient();
-    const remotePath = `/uploads/${file.name}`;
-    
-    // Ensure the buffer is not empty
     if (buffer.length === 0) {
       return { success: false, error: "File buffer is empty" };
     }
 
-    await client.putFileContents(remotePath, buffer);
+    // Ensure upload directory exists
+    if (!existsSync(UPLOAD_DIR)) {
+      await mkdir(UPLOAD_DIR, { recursive: true });
+    }
+
+    const ext = path.extname(file.name) || ".jpg";
+    const filename = `${uuidv4()}${ext}`;
+    const filePath = path.join(UPLOAD_DIR, filename);
+
+    await writeFile(filePath, buffer);
+
     revalidatePath("/");
-    return { success: true, path: remotePath };
+    // Return a URL that goes through our local serve API
+    return { success: true, url: `/api/uploads/${filename}` };
   } catch (error: any) {
-    console.error("Upload Error Details:", error);
-    const message = error?.message || "Internal server error during upload";
-    return { success: false, error: message };
+    console.error("Upload Error:", error);
+    return { success: false, error: error?.message || "Upload failed" };
   }
 }
