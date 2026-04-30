@@ -4,9 +4,10 @@ import Announcement from '@/models/Announcement';
 import BusinessUnit from '@/models/BusinessUnit';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { recordLog } from '@/utils/logger';
+import { recordLog, recordSecurityEvent } from '@/utils/logger';
 import { CATEGORIES } from '@/types';
 import https from 'https';
+import { AnnouncementSchema } from '@/lib/schemas';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -35,11 +36,28 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
+      await recordSecurityEvent('security_unauthorized_access', {
+        reason: 'Unauthenticated POST to /api/announcements',
+        endpoint: '/api/announcements',
+        ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown',
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     await dbConnect();
     const data = await req.json();
+
+    // Zod validation
+    const parsed = AnnouncementSchema.safeParse(data);
+    if (!parsed.success) {
+      await recordSecurityEvent('security_validation_failed', {
+        reason: `Invalid announcement payload: ${parsed.error.issues.map(i => i.message).join(', ')}`,
+        endpoint: '/api/announcements',
+        identity: (session.user as any)?.name || 'unknown',
+      });
+      return NextResponse.json({ error: 'Invalid data', details: parsed.error.issues }, { status: 400 });
+    }
+
     const username = (session.user as { name?: string } | undefined)?.name;
     const payload = data as Record<string, unknown>;
 

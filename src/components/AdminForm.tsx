@@ -911,7 +911,7 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
                 { id: 'GENERAL', label: 'Public Access', desc: 'Open to all employees', icon: 'globe' },
                 { id: 'BU_ONLY', label: 'Business Unit Restricted', desc: 'Specific business units', icon: 'building-2' },
                 { id: 'INVITE_ONLY', label: 'Exclusive Invite', desc: 'Designated guests only', icon: 'ticket' },
-                { id: 'RULE_BASED', label: 'Attribute-Based', desc: 'Filtered by profile data', icon: 'filter' },
+                { id: 'RULE_BASED', label: 'Custom', desc: 'Filtered by profile data', icon: 'sliders' },
               ].map((type) => (
                 <button
                   key={type.id}
@@ -1079,9 +1079,9 @@ export default function AdminForm({ category, onSubmit, onCancel, editingAnnounc
                   <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-2.5">Rule Type</label>
                   <div className="px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-[#ed1c24] uppercase tracking-widest flex items-center gap-3">
                     <div className="w-7 h-7 rounded-md bg-[#ed1c24]/10 border border-[#ed1c24]/20 flex items-center justify-center">
-                      <LucideIcon name="fingerprint" className="w-3.5 h-3.5" />
+                      <LucideIcon name="cake" className="w-3.5 h-3.5" />
                     </div>
-                    Profile-Based Logic: Birthday Filter
+                    Custom: Birthday Filter
                   </div>
                 </div>
                 <div>

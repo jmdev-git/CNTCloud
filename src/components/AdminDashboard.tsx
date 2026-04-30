@@ -1510,19 +1510,19 @@ export default function AdminDashboard({
   const getStatGradient = (category: CategoryType) => {
     switch (category) {
       case "events":
-        return "bg-zinc-950 border-red-900/30 hover:border-[#ed1c24]/50";
+        return "bg-red-950/60 border-red-700/50 hover:border-[#ed1c24]/70";
       case "company-news":
-        return "bg-zinc-950 border-emerald-900/30 hover:border-emerald-500/50";
+        return "bg-emerald-950/60 border-emerald-700/50 hover:border-emerald-400/70";
       case "urgent-notices":
-        return "bg-zinc-950 border-rose-900/30 hover:border-rose-500/50";
+        return "bg-rose-950/60 border-rose-700/50 hover:border-rose-400/70";
       case "policy":
-        return "bg-zinc-950 border-violet-900/30 hover:border-violet-500/50";
+        return "bg-violet-950/60 border-violet-700/50 hover:border-violet-400/70";
       case "birthday-celebrants":
-        return "bg-zinc-950 border-amber-900/30 hover:border-amber-500/50";
+        return "bg-amber-950/60 border-amber-700/50 hover:border-amber-400/70";
       case "food-menu":
-        return "bg-zinc-950 border-zinc-800/30 hover:border-zinc-400/50";
+        return "bg-zinc-800/60 border-zinc-600/50 hover:border-zinc-400/70";
       default:
-        return "bg-zinc-950 border-zinc-800/30";
+        return "bg-zinc-800/60 border-zinc-600/50";
     }
   };
 
@@ -1540,13 +1540,13 @@ export default function AdminDashboard({
 
   const getStatTopGradient = (category: CategoryType) => {
     switch (category) {
-      case "events":         return "from-red-600/40 via-red-900/20 to-transparent";
-      case "company-news":   return "from-emerald-600/40 via-emerald-900/20 to-transparent";
-      case "urgent-notices": return "from-rose-600/40 via-rose-900/20 to-transparent";
-      case "policy":         return "from-violet-600/40 via-violet-900/20 to-transparent";
-      case "birthday-celebrants": return "from-amber-600/40 via-amber-900/20 to-transparent";
-      case "food-menu":      return "from-zinc-600/30 via-zinc-900/20 to-transparent";
-      default:               return "from-zinc-600/30 via-zinc-900/20 to-transparent";
+      case "events":              return "from-red-500/60 via-red-700/30 to-transparent";
+      case "company-news":        return "from-emerald-500/60 via-emerald-700/30 to-transparent";
+      case "urgent-notices":      return "from-rose-500/60 via-rose-700/30 to-transparent";
+      case "policy":              return "from-violet-500/60 via-violet-700/30 to-transparent";
+      case "birthday-celebrants": return "from-amber-500/60 via-amber-700/30 to-transparent";
+      case "food-menu":           return "from-zinc-500/50 via-zinc-700/25 to-transparent";
+      default:                    return "from-zinc-500/50 via-zinc-700/25 to-transparent";
     }
   };
 
@@ -2191,15 +2191,25 @@ export default function AdminDashboard({
                         </div>
                         {/* Table Body */}
                         <div className="divide-y divide-white/5">
-                          {logs.map((log) => (
+                          {logs.map((log) => {
+                            const isSecurity = log.action.startsWith("security_");
+                            return (
                             <div
                               key={log._id}
-                              className="grid grid-cols-[1.2fr_2fr_1fr_1fr] gap-4 px-8 py-5 hover:bg-zinc-900/20 transition-all group"
+                              className={cn(
+                                "grid grid-cols-[1.2fr_2fr_1fr_1fr] gap-4 px-8 py-5 hover:bg-zinc-900/20 transition-all group",
+                                isSecurity && "bg-rose-950/20 border-l-2 border-rose-500/60"
+                              )}
                             >
                               <div className="flex items-center gap-3.5 min-w-0">
-                                <div className="w-8 h-8 rounded-lg bg-zinc-900/40 border border-white/10 flex items-center justify-center text-zinc-400 group-hover:text-[#ed1c24] transition-colors shrink-0">
+                                <div className={cn(
+                                  "w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 transition-colors",
+                                  isSecurity
+                                    ? "bg-rose-500/10 border-rose-500/20 text-rose-400"
+                                    : "bg-zinc-900/40 border-white/10 text-zinc-400 group-hover:text-[#ed1c24]"
+                                )}>
                                   <LucideIcon
-                                    name="user"
+                                    name={isSecurity ? "shield-alert" : "user"}
                                     className="w-3.5 h-3.5"
                                   />
                                 </div>
@@ -2212,16 +2222,16 @@ export default function AdminDashboard({
                                   <span
                                     className={cn(
                                       "text-[8px] font-black uppercase tracking-[0.1em] px-2 py-0.5 rounded border leading-none",
-                                      log.action.toLowerCase().includes("delete")
-                                        ? "text-rose-500 bg-rose-500/5 border-rose-500/10"
-                                        : log.action
-                                              .toLowerCase()
-                                              .includes("create")
-                                          ? "text-emerald-500 bg-emerald-500/5 border-emerald-500/10"
-                                          : "text-[#ed1c24] bg-[#ed1c24]/5 border-[#ed1c24]/10",
+                                      isSecurity
+                                        ? "text-rose-400 bg-rose-500/10 border-rose-500/20"
+                                        : log.action.toLowerCase().includes("delete")
+                                          ? "text-rose-500 bg-rose-500/5 border-rose-500/10"
+                                          : log.action.toLowerCase().includes("create")
+                                            ? "text-emerald-500 bg-emerald-500/5 border-emerald-500/10"
+                                            : "text-[#ed1c24] bg-[#ed1c24]/5 border-[#ed1c24]/10",
                                     )}
                                   >
-                                    {log.action.replace("_", " ")}
+                                    {isSecurity ? "⚠ " : ""}{log.action.replaceAll("_", " ")}
                                   </span>
                                 </div>
                                 <span
@@ -2234,11 +2244,7 @@ export default function AdminDashboard({
                               <div className="flex items-center justify-end text-[13px] text-zinc-400 font-semibold">
                                 {new Date(log.timestamp).toLocaleDateString(
                                   undefined,
-                                  {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  },
+                                  { month: "short", day: "numeric", year: "numeric" },
                                 )}
                               </div>
                               <div className="flex items-center justify-end text-[13px] text-zinc-500 font-bold tracking-tight">
@@ -2248,7 +2254,8 @@ export default function AdminDashboard({
                                 )}
                               </div>
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     </div>

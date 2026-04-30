@@ -91,8 +91,21 @@ export default function QRScanner({
           console.error("Scanner error:", err);
           if (isMounted) {
             let msg = "Could not access camera.";
-            if (err?.name === "NotAllowedError") msg = "Camera permission denied. Please allow access.";
-            if (err?.name === "NotReadableError") msg = "Camera is already in use by another app.";
+            if (err?.name === "NotAllowedError") {
+              msg = "Camera permission denied. Please allow camera access in your browser settings.";
+            } else if (err?.name === "NotReadableError") {
+              msg = "Camera is already in use by another app. Close other apps using the camera and try again.";
+            } else if (err?.name === "NotFoundError") {
+              msg = "No camera found on this device.";
+            } else if (
+              err?.message?.toLowerCase().includes("not supported") ||
+              err?.message?.toLowerCase().includes("streaming") ||
+              err?.message?.toLowerCase().includes("secure")
+            ) {
+              msg = "Camera access requires HTTPS. Your browser blocks camera access on HTTP connections. Ask your IT admin to enable HTTPS, or access this page via localhost.";
+            } else if (err?.message) {
+              msg = err.message;
+            }
             setCameraError(msg);
             setIsInitializing(false);
             setIsScannerReady(false);
@@ -268,9 +281,28 @@ export default function QRScanner({
 
             <div className="p-8">
               {cameraError && (
-                <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                  <LucideIcon name="alert-circle" className="w-5 h-5 shrink-0" />
-                  <p className="text-xs font-bold uppercase tracking-widest">{cameraError}</p>
+                <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
+                  <LucideIcon name="alert-circle" className="w-5 h-5 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest">{cameraError}</p>
+                    {cameraError.includes("HTTPS") && (
+                      <p className="text-[10px] text-red-400/70 mt-2 font-medium normal-case tracking-normal">
+                        To fix: Set up Nginx with SSL on the server, or use a self-signed certificate. Camera works normally on localhost.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {typeof window !== "undefined" && window.location.protocol === "http:" && window.location.hostname !== "localhost" && !cameraError && (
+                <div className="mb-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-start gap-3">
+                  <LucideIcon name="shield-alert" className="w-5 h-5 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-widest">HTTP Connection Detected</p>
+                    <p className="text-[10px] text-amber-400/70 mt-1 font-medium normal-case tracking-normal">
+                      Camera access may be blocked. Browsers require HTTPS for camera access on non-localhost connections. Contact IT to enable HTTPS.
+                    </p>
+                  </div>
                 </div>
               )}
 

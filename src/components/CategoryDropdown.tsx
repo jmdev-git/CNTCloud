@@ -97,13 +97,7 @@ export default function CategoryDropdown({ selectedCategory, onCategoryChange, s
                 "border-white/10 bg-[#000] text-white/60 hover:text-white hover:border-white/30 shadow-xl"
               )}
             >
-              <div className="flex items-center gap-3">
-                <LucideIcon 
-                  name={selectedCategory === 'all' ? 'layers' : getIconNameForCategory(selectedCategory as CategoryType)} 
-                  className="w-4 h-4" 
-                />
-                <SelectValue placeholder="All Categories" />
-              </div>
+              <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent className="rounded-xl border border-white/10 shadow-2xl bg-[#000] p-1">
               <SelectItem value="all" className="rounded-lg py-2.5 focus:bg-white/5 focus:text-white cursor-pointer font-black text-[10px] uppercase tracking-widest text-white">
@@ -168,9 +162,7 @@ export default function CategoryDropdown({ selectedCategory, onCategoryChange, s
                   className="rounded-lg py-2.5 focus:bg-white/5 focus:text-white cursor-pointer font-black text-[10px] uppercase tracking-widest text-white mb-1"
                 >
                   <div className="flex items-center gap-3">
-                    <span 
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-xl text-white shadow-lg overflow-hidden border border-white/10 p-1 bg-white/5"
-                    >
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl text-white shadow-lg overflow-hidden border border-white/10 p-1 bg-white/5">
                       {bu.image ? (
                         <img src={bu.image} alt={bu.label} className="w-full h-full object-contain" />
                       ) : (

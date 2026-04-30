@@ -27,73 +27,76 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        await dbConnect();
+        try {
+          await dbConnect();
+        } catch (err) {
+          console.error("[AUTH] DB connect failed:", err);
+          return null;
+        }
 
         if (!credentials?.username || !credentials.password) {
           return null;
         }
 
-        const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const uname = credentials.username.trim();
-        // Case-insensitive username lookup
-        const user = await User.findOne({ username: new RegExp(`^${esc(uname)}$`, 'i') }).select('+password');
+        const uname = credentials.username.trim().toLowerCase();
 
-        if (!user) {
+        let user: any = null;
+        try {
+          user = await User.findOne({ username: uname }).select("+password");
+          if (!user) {
+            user = await User.findOne({
+              username: { $regex: new RegExp(`^${uname.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") },
+            }).select("+password");
+          }
+        } catch (err) {
+          console.error("[AUTH] DB query failed:", err);
           return null;
         }
 
-        let isPasswordMatch = false;
-        const storedPassword = user.password || '';
+        if (!user) return null;
 
-        // Check if it's a bcrypt hash
-        const isBcrypt = storedPassword.startsWith('$2a$') || storedPassword.startsWith('$2b$') || storedPassword.startsWith('$2y$');
+        const storedPassword: string = user.password || "";
+        const isBcrypt =
+          storedPassword.startsWith("$2a$") ||
+          storedPassword.startsWith("$2b$") ||
+          storedPassword.startsWith("$2y$");
+
+        let isPasswordMatch = false;
 
         if (isBcrypt) {
           isPasswordMatch = await bcrypt.compare(credentials.password, storedPassword);
         } else {
-          // If it's not a bcrypt hash, it's likely plain text
           isPasswordMatch = credentials.password === storedPassword;
-
-          // If it matches as plain text, we should hash it and save it back for security
           if (isPasswordMatch) {
             try {
-              const hashedPassword = await bcrypt.hash(credentials.password, 10);
-              await User.updateOne({ _id: user._id }, { $set: { password: hashedPassword } });
-              console.log(`Auto-hashed plain text password for user: ${user.username}`);
-            } catch (err) {
-              console.error('Failed to auto-hash password:', err);
-            }
+              const hashed = await bcrypt.hash(credentials.password, 10);
+              await User.updateOne({ _id: user._id }, { $set: { password: hashed } });
+            } catch {}
           }
         }
 
-        if (!isPasswordMatch) {
-          return null;
-        }
+        if (!isPasswordMatch) return null;
 
-        const canManageUsers = user.canManageUsers === true || user.username === 'itadmin' || user.username === 'it.support@cntpromoads.com';
-        const businessUnits = Array.isArray(user.businessUnits) ? user.businessUnits : undefined;
+        const canManageUsers =
+          user.canManageUsers === true ||
+          user.username === "itadmin" ||
+          user.username === "it.support@cntpromoads.com";
 
-        const isItAdminEmail = (u: string) => {
-          const lower = u.toLowerCase();
-          return lower === 'itadmin' || lower === 'it.support@cntpromoads.com';
-        };
-
-        let displayName = user.name || user.username;
-        if (isItAdminEmail(user.username)) {
-          displayName = 'IT Admin';
-        }
+        const isItAdmin =
+          user.username.toLowerCase() === "itadmin" ||
+          user.username.toLowerCase() === "it.support@cntpromoads.com";
 
         const authorizedUser: AuthorizedUser = {
           id: user._id.toString(),
-          name: displayName,
+          name: isItAdmin ? "IT Admin" : user.name || user.username,
           username: user.username,
-          role: 'admin' as const,
+          role: "admin",
           allowedCategories: user.allowedCategories ?? undefined,
           canManageUsers,
-          businessUnits,
-        isScannerOnly: !!user.isScannerOnly,
-        scannerRegTypes: user.scannerRegTypes || [],
-      };
+          businessUnits: Array.isArray(user.businessUnits) ? user.businessUnits : undefined,
+          isScannerOnly: !!user.isScannerOnly,
+          scannerRegTypes: user.scannerRegTypes || [],
+        };
 
         return authorizedUser;
       },
@@ -105,81 +108,31 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async redirect({ url, baseUrl }) {
-      const base = baseUrl.replace(/\/$/, '');
-      // If the user is logging in, redirect them to /admin instead of the root
+      const base = baseUrl.replace(/\/$/, "");
       if (url.startsWith(base)) {
-        if (url === base || url === `${base}/`) {
-          return `${base}/admin`;
-        }
+        if (url === base || url === `${base}/`) return `${base}/admin`;
         return url;
       }
       return base;
     },
     async jwt({ token, user }) {
-      type RoleUser = {
-        id: string;
-        name?: string;
-        username?: string;
-        role?: "admin";
-        allowedCategories?: string[];
-        canManageUsers?: boolean;
-        businessUnits?: string[];
-        isScannerOnly?: boolean;
-        scannerRegTypes?: string[];
-      };
-      type RoleToken = JWT & {
-        id?: string;
-        username?: string;
-        role?: "admin";
-        allowedCategories?: string[];
-        canManageUsers?: boolean;
-        businessUnits?: string[];
-        isScannerOnly?: boolean;
-        scannerRegTypes?: string[];
-      };
-      const u = user as RoleUser | undefined;
-      const t = token as RoleToken;
-      
-      // Only update token on sign in
+      const u = user as AuthorizedUser | undefined;
       if (u) {
-        t.id = u.id;
-        t.name = u.name;
-        t.username = u.username ?? '';
-        t.role = u.role ?? 'admin';
-        t.allowedCategories = u.allowedCategories;
-        t.canManageUsers = u.canManageUsers === true;
-        t.businessUnits = u.businessUnits;
-        t.isScannerOnly = u.isScannerOnly;
-        t.scannerRegTypes = u.scannerRegTypes;
+        (token as any).id = u.id;
+        (token as any).name = u.name;
+        (token as any).username = u.username;
+        (token as any).role = u.role;
+        (token as any).allowedCategories = u.allowedCategories;
+        (token as any).canManageUsers = u.canManageUsers === true;
+        (token as any).businessUnits = u.businessUnits;
+        (token as any).isScannerOnly = u.isScannerOnly;
+        (token as any).scannerRegTypes = u.scannerRegTypes;
       }
-      return t;
+      return token;
     },
     async session({ session, token }) {
-      type RoleToken = JWT & {
-        id?: string;
-        name?: string;
-        username?: string;
-        role?: "admin";
-        allowedCategories?: string[];
-        canManageUsers?: boolean;
-        businessUnits?: string[];
-        isScannerOnly?: boolean;
-        scannerRegTypes?: string[];
-      };
-      const t = token as RoleToken;
-      const s = session as {
-        user?: {
-          id?: string;
-          name?: string;
-          username?: string;
-          role?: "admin";
-          allowedCategories?: string[];
-          canManageUsers?: boolean;
-          businessUnits?: string[];
-          isScannerOnly?: boolean;
-          scannerRegTypes?: string[];
-        };
-      };
+      const t = token as any;
+      const s = session as any;
       if (!s.user) s.user = {};
       if (t.id) s.user.id = t.id;
       if (t.name) s.user.name = t.name;

@@ -1,6 +1,6 @@
 module.exports = {
   apps: [{
-    name: 'CNTCloud',
+    name: 'cntloudspace',
     script: 'server.js',
     cwd: './',
     instances: 1,

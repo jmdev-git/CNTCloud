@@ -30,11 +30,10 @@ export async function POST(req: Request) {
     // Set cookie with proper settings for production
     res.cookies.set("verified_email", emailLower, {
       httpOnly: true,
-      secure: false, // Set to false for HTTP (change to true if using HTTPS)
+      secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
-      domain: undefined // Let the browser determine the domain
     });
     
     return res;

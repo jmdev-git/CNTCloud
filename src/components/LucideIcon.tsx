@@ -118,6 +118,11 @@ const LucideIcon = ({ name, className = "w-4 h-4", size }: LucideIconProps) => {
         return 'M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8 M3 3v5h5';
       case 'building':
         return 'M3 21h18M9 8h1m-1 4h1m-1 4h1m5-8h1m-1 4h1m-1 4h1M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16';
+      case 'sliders':
+        return 'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6';
+      case 'settings-2':
+      case 'sliders-horizontal':
+        return 'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6';
       case 'zap':
         return 'M13 2 L3 14h9l-1 8 10-12h-9l1-8z';
       case 'key':
