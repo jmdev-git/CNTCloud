@@ -19,6 +19,17 @@ type AuthorizedUser = {
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: false, // Allow HTTP for local network deployment
+      }
+    },
+  },
   providers: [
     Credentials({
       name: "Admin",
