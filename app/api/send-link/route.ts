@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     // Set cookie with proper settings for production
     res.cookies.set("verified_email", emailLower, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: false, // Allow HTTP for local network deployment
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,
       path: "/",
