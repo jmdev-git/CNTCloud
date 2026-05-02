@@ -1,0 +1,9 @@
+# CLOUDINARY_CLOUD_NAME=dpi0c0qmg
+# CLOUDINARY_API_KEY=725111263871577
+# CLOUDINARY_API_SECRET=bWW3Sz9zJzlS5ySrlJSecry0z3E
+# CLOUDINARY_URL=cloudinary://725111263871577:bWW3Sz9zJzlS5ySrlJSecry0z3E@dpi0c0qmg
+NEXTAUTH_SECRET=1f9f5d2e4b7a4c1c92c0d9b3e8f6a1d2
+NEXTAUTH_URL=https://192.168.50.100:1101
+# MONGO_URI=mongodb+srv://cntpromoadsitsuport_db_user:ORG26ejwHLLiyQCC@cntpulse.ertqlft.mongodb.net/pulse
+MONGO_URI=mongodb://cntcloudspace:JMDev%40hackme10!3128@localhost:27017/pulse?authSource=admin
+WEBHOOK_URL=https://cntcloudspace.tw3.quickconnect.to/direct/webapi/entry.cgi?api=SYNO.Chat.External&method=incoming&version=2&token=%22zEN3u7ckTZi8gR7yhavsKKnMJl4j9CW5jz8zzpOiK7RMVfdkCubfhruy1L7ngxlD%22
